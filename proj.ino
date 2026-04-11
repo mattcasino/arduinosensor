@@ -37,8 +37,8 @@ const unsigned long sendInterval = 10000;   //how often the esp-01s sends data
 
 //these store the last time the part updated in ms. When the value is greater than the interval, it means that we should update
 unsigned long lastSonic = 0;
-unsigned long lastSens = 0;
-unsigned long lastSend = 0;
+unsigned long lastSens = 5000;
+unsigned long lastSend = 2050;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);  //onboard display
 
@@ -174,8 +174,8 @@ void loop() {
     lcd.print(F("      "));
     lastSens = now;
   }
-  // Read AHT
-  if (now - lastSend >= sendInterval) {
+  // Read AHT, dont fire if sens just did, in order to reduce high instantaneous voltage spikes
+  if (now - lastSend >= sendInterval && !(sensorInterval < 25)) {
     doc["humidity"] = humidity;
     doc["temperatureC"] = tempC;
     // Only read when ready
